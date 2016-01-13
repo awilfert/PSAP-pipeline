@@ -1,7 +1,15 @@
 ## CONTENTS
 THE PSAP PACKAGE CONTAINS FOUR BASH SCRIPTS AND ALL DEPENDANT R SCRIPTS AND LOOKUP TABLES. EACH SCRIPT IS DESCRIBED BELOW.
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an Rscript that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
+=======
 1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an R script that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
+>>>>>>> d6ed2b44d6d6c7c4a7a0c07a07f7ccc30fd8de0e
+=======
+1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an R script that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
+>>>>>>> d6ed2b44d6d6c7c4a7a0c07a07f7ccc30fd8de0e
 
 2) ```individual_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an Rscript that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, and calls an R script that will report out candiate variants (inheritance pattern consistent with disease model)
 
