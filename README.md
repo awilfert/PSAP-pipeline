@@ -15,7 +15,7 @@ This pipeline uses the R statistical software and ANNOVAR.  Please ensure R (htt
 ##### NOTE: Using other annotation software is not recommended because annotations may differ from the PSAP lookup tables and will introduce biases in downstream analyses. 
 
 ## PREPARING THE SCRIPT
-The local paths to the PSAP directory and ANNOVAR software need to be hard coded into the ```get_annovar_annos.sh```, ```family_analysis_pipeline.sh``` and ```individual_analysis_piepline.sh`` scripts at the lines indicated within each script.
+The local paths to the PSAP directory and ANNOVAR software need to be hard coded into the ```get_annovar_annos.sh```, ```family_analysis_pipeline.sh``` and ```individual_analysis_piepline.sh`` scripts at the lines indicated within each script.  Do not put the text string for the paths in quotes.
 
 Prior to running any of the analysis or annotation scripts for the first time you will need to run the ```get_annovar_annos.sh``` script to download all necessary ANNOVAR annotation files.  
 ##### NOTE: It may take this script several days to download all of the necessary annotation files as some of them are very large (80 GB)
