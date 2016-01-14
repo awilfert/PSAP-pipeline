@@ -1,15 +1,7 @@
 ## CONTENTS
 THE PSAP PACKAGE CONTAINS FOUR BASH SCRIPTS AND ALL DEPENDANT R SCRIPTS AND LOOKUP TABLES. EACH SCRIPT IS DESCRIBED BELOW.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an Rscript that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
-=======
 1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an R script that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
->>>>>>> d6ed2b44d6d6c7c4a7a0c07a07f7ccc30fd8de0e
-=======
-1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an R script that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
->>>>>>> d6ed2b44d6d6c7c4a7a0c07a07f7ccc30fd8de0e
 
 2) ```individual_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an Rscript that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, and calls an R script that will report out candiate variants (inheritance pattern consistent with disease model)
 
@@ -86,19 +78,6 @@ For best results, all individuals or family members should be included in a sing
 
 This script will write all results to the directory in which it is called.  
 ##### Please ensure the script is called from a directory in which you have permission to write files.  When the script finishes running it will print the directory containing all results.
-
-
-
-```
-$ANNOVAR_PATH/annovar_latest/annotate_variation.pl
-$ANNOVAR_PATH/annovar_latest/convert2annovar.pl
-$ANNOVAR_PATH/annovar_latest/table_annovar.pl
-$ANNOVAR_PATH/annovar_latest/humandb/
-$PATH_PATH/psap/RScripts/generic_apply_popStat.R
-$PATH_PATH/psap/RScripts/generic_candidate_analysis.R
-$PATH_PATH/psap/RScripts/individual_apply_popstat.R
-$PATH_PATH/psap/RScripts/unrelated_candidate_analysis.R
-```
 
 ## WHEN USING THIS SCRIPT PLEASE CITE
 Wang K, Li M, Hakonarson H. ANNOVAR: Functional annotation of genetic variants from next-generation sequencing data. Nucleic Acids Research, 38:e164, 2010
