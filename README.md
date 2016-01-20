@@ -20,7 +20,7 @@ The local paths to the PSAP directory and ANNOVAR software need to be hard coded
 Prior to running any of the analysis or annotation scripts for the first time you will need to run the ```get_annovar_annos.sh``` script to download all necessary ANNOVAR annotation files.  
 ##### NOTE: It may take this script several days to download all of the necessary annotation files as some of them are very large (80 GB)
 
-## RUNING THE SCRIPT
+## RUNNING THE SCRIPT
 To run the ```family_analysis_pipeline.sh``` or ```individual_analysis_pipeline.sh``` a VCF file, output file name, and pedigree file must be provided as arguments to the script in that order.
 
 EG. ```family_analysis_pipeline.sh example.VCF example example.ped OR individual_analysis_pipeline.sh example.VCF example example.ped```
