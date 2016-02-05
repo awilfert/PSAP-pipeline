@@ -21,6 +21,9 @@ perl annotate_variation.pl -downdb -buildver hg19 -webfrom annovar snp137 humand
 
 # Download GencodeV19 gene map from UCSC
 perl annotate_variation.pl -downdb -buildver hg19 wgEncodeGencodeBasicV19 humandb/
+for chr in {1..22} M X Y; do wget -P /lts/dclab/amy/annovar/humandb/ http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/chr${chr}.fa.gz; done
+for chr in {1..22} M X Y; do gunzip /lts/dclab/amy/annovar/humandb/chr${chr}.fa.gz; done
+perl /lts/dclab/amy/annovar/retrieve_seq_from_fasta.pl -format genericGene -seqdir /lts/dclab/amy/annovar/humandb/ hg19_wgEncodeGencodeBasicV19.txt --outfile hg19_wgEncodeGencodeBasicV19Mrna.fa
 
 # Move ExAC allele frequencies provided with the PSAP pipeline to the ANNOVAR annotation folder and unzip
 mv ${PSAP_PATH}/lookups/hg19_mac63kFreq_ALL.txt.gz humandb/
