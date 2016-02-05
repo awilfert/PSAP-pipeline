@@ -56,43 +56,66 @@ for(i in af){
 
 ## ANALYSIS STEP 2: Validate inheritance models
 if(n.uf > 0){
-  uf.dat = list()
-  uf.ch = c()
-  for(i in uf){
-    dat<-read.table(file=paste("annotated/",fam.id,"_",i,"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
-    dat$vid = paste(dat$Chr, dat$Start, dat$Alt,sep=":")
-    if(length(uf.dat) == 0){
-      for(g in 1:length(genos)){
-        tmp = dat[which(dat[,i] == genos[g]),]
-        uf.dat[[g]] = tmp
-        if(genos[g] == "het"){
-          gene.tab = table(af.dat[[3]]$Gene.wgEncodeGencodeBasicV19[which(af.dat[[3]][paste("Dz.Model.",af[1],sep="")] == "REC-het" & af.dat[[3]]$vid %in% tmp.vid)])
-          uf.ch = c(uf.ch,gene.tab[which(gene.tab > 1)])
-        }
-      }
-    }else{
-      for(g in 1:length(genos)){
-        tmp = dat[which(dat[,i] == genos[g]),]
-        uf.dat[[g]] = tmp
-        if(genos[g] == "het"){
-          gene.tab = table(af.dat[[3]]$Gene.wgEncodeGencodeBasicV19[which(af.dat[[3]][paste("Dz.Model.",af[1],sep="")] == "REC-het" & af.dat[[3]]$vid %in% tmp.vid)])
-          uf.ch = c(uf.ch,gene.tab[which(gene.tab > 1)])
-        }
-      }
-    }
-  }
+	uf.dat = data.frame()
+	for(i in uf){
+		dat<-read.table(file=paste("annotated/",fam.id,"_",i,"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
+		dat$vid = paste(dat$Chr, dat$Start, dat$Alt,sep=":")
+		uf.dat = rbind(uf.dat,dat)
+	}
 
-  candiates = list()
-  candidates[[1]] = af.dat[[1]][which(!af.dat[[1]]$vid %in% uf.dat[[1]]$vid & !af.dat[[2]]$vid %in% uf.dat[[2]]$vid),]
-  candidates[[2]] = af.dat[[2]][which(!af.dat[[2]]$vid %in% uf.dat[[2]]$vid & !af.dat[[2]]$Gene.wgEncodeGencodeBasicV19 %in% uf.ch),]
-  candidates[[3]]	= af.dat[[3]][which(!af.dat[[3]]$Gene.wgEncodeGencodeBasicV19 %in% uf.ch & af.dat[[3]]$vid %in% uf.dat[[2]]$vid),]
+	uf.dat = unique(uf.dat[c("Gene.wgEncodeGencodeBAsicV19","Chr","Start","Ref","Alt","Dz.Model","Geno","vid","popScore")])
 
-  validated = data.frame()
-  for(i in 1:length(candiates)) validated = rbind(validated,candidates[[i]])
+  candiates = data.frame()
+  for(i in 1:length(af.dat)) candidates= rbind(candidate,af.dat[[i]])
+  
+  candidates$validation = "ok"
+  candidates$validation[which(candidates$Dz.Model == "DOM-het" & candidates$vid %in% uf.dat$vid)] = "violation"
+	candidates$validation[which(candidates$Dz.Model != "DOM-het" & canidates$vid %in% uf.dat$vid[which(uf.dat$Dz.Model != "DOM-het")])] = "violation"
+	
+	# missing mate
+	# 1) pull out chets tagged with violation
+	violations = candidates[which(candidates$Dz.Model == "REC-chet" & candidates$validation == "violation"),]
+	# 2) loop over violated chet genes
+	for(g in violations$gene){
+	#	3) look at subset of non-violated chets in gene
+		ok.chets = which(candidates$Gene.wgEncodeGencodeBasicV19 == g & candidates$Dz.Model == "REC-chet" & candidates$validation == "ok")
+	# 4) extract pid for violated chets in gene
+		violated.pid = unique(unlist(strsplit(as.character(violations$pid[which(violations$Gene.wgEncodeGencodeBasicV19 == g)]),",",fixed=F)))
+	# 5) look for extracted pid in non-violated chets - gsub pid for space
+		for(p in violated.pid){
+#			candidates$validation[ok.chets][grep(p,candidates$pid[ok.chets])] = "missing mate"
+			if(length(ok.chets) > 0){
+				for(row in ok.chets){
+					if(length(grep(",",candidates$pid[row])) > 0){
+						pids = unlist(strsplit(candidates$pid[row],",",fixed=T))
+						print(pids)
+						pids = pids[which(pids != p)]
+						print(pids)					
+						if(length(pids) > 0){ 
+							candidates$pid[row] = paste(pids,collapse=",") 
+						}else{
+							candidates$pid[row] = NA
+						}
+					}else{
+						pids = candidates$pid[row]
+						pids = pids[-which(pids == p)]
+						if(length(pids) > 0){ 
+							candidates$pid[row] = pids 
+						}else{
+							candidates$pid[row] = NA
+						}
+					}
+				}
+			}
+		}
+	}
 }else{
-  validated = data.frame()
-  for(i in 1:length(af.dat)) validated = rbind(validated,af.dat[[i]])
+  candidates = data.frame()
+  for(i in 1:length(af.dat)) candidates = rbind(candidates,af.dat[[i]])
+  candidates$validation = "ok"
 }
+
+validated = candidates[which(is.na(candidates$pid) == F & candidates$validation != "violation"),]
 
 ## ANALYSIS STEP 3: FLAG SITES THAT HAVE LOW COVERAGE IN THE MAC61K DATA, MISSING ALLELE FREQUENCIES IN THE MAC61K DATA BUT NOT IN THE ESP AND 1000 GENOMES DATA, OR IS AN HGMD GENE WITH A MATCHING MODE OF INHERITANCE
 validated$Flag = 0

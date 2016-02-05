@@ -52,41 +52,38 @@ for(i in af){
 
 # ANALYSIS STEP 2: VALIDATE VARIANT - if there are UFs
 if(n.uf > 0){
-  uf.dat = list()
-  uf.ch = c()
-  for(i in uf){
-    if(length(uf.dat) == 0){
-      for(g in 1:length(genos)){
-        tmp = dat[which(dat[,i] == genos[g]),]
-        uf.dat[[g]] = tmp
-        if(genos[g] == "het"){
-          gene.tab = table(af.dat[[3]]$Gene.wgEncodeGencodeBasicV19[which(af.dat[[3]][paste("Dz.Model.",af[1],sep="")] == "REC-chet" & af.dat[[3]]$vid %in% tmp$vid)])
-          uf.ch = c(uf.ch,gene.tab[which(gene.tab > 1)])
-        }
-      }
-    }else{
-      for(g in 1:length(genos)){
-        tmp = dat[which(dat[,i] == genos[g]),]
-        uf.dat[[g]] = tmp
-        if(genos[g] == "het"){
-          gene.tab = table(af.dat[[3]]$Gene.wgEncodeGencodeBasicV19[which(af.dat[[3]][paste("Dz.Model.",af[1],sep="")] == "REC-chet" & af.dat[[3]]$vid %in% tmp$vid)])
-          uf.ch = c(uf.ch,gene.tab[which(gene.tab > 1)])
-        }
-      }
-    }
-  }
-  candidates = list()
-  candidates[[1]] = af.dat[[1]][which(!af.dat[[1]]$vid %in% uf.dat[[1]]$vid & !af.dat[[1]]$vid %in% uf.dat[[2]]$vid),]
-  candidates[[2]] = af.dat[[2]][which(!af.dat[[2]]$vid %in% uf.dat[[2]]$vid & !af.dat[[2]]$Gene.wgEncodeGencodeBasicV19 %in% uf.ch),]
-  candidates[[3]] = af.dat[[3]][which(!af.dat[[3]]$Gene.wgEncodeGencodeBasicV19 %in% uf.ch & af.dat[[3]]$vid %in% uf.dat[[2]]$vid),]
+	uf.dat = data.frame()
+	uf.dat = dat[unlist(lapply(1:nrow(dat),function(i) if(any(dat[i,uf] != "ref")) return(i))),]
 
-  validated = data.frame()
-  for(i in 1:length(candidates)) validated = rbind(validated,candidates[[i]])
+  candiates = data.frame()
+  for(i in 1:length(af.dat)) candidates= rbind(candidate,af.dat[[i]])
+  
+  candidates$validation = "ok"
+  af.het.rows = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model",af,sep="")] == "DOM-het") & candidates$vid %in% uf.dat$vid) return(i))) # identifies het candidates in affected(s) that are also present in at least one unaffected
+  candidates$validation[af.het.rows] = "violation" # flags the above identifeid variants as a violation of the the disease inheritance model
+  uf.rec.rows = unlist(lapply(1:nrow(uf.dat), function(i) if(any(uf.dat[i,uf] != "DOM-het")) return(i))) # identifies rows in the unaffected data that are not DOM-het (all other hets are allowed)
+  af.rec.rows = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model",af,sep="")] != "DOM-het") & candidates$vid %in% uf.dat$vid[uf.rec.rows]) return(i))) # identifies REC disease model candidates that are also present in at least one unaffected individual as a REC-hom or REC-chet
+  candidates$validation[af.rec.rows] = "violation"
+		
+	# missing mate
+	# 1) pull out chets tagged with violation
+	af.chet.rows = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model",af,sep="")] != "REC-chet") & candidates$validation == "violation") return(i))) # identifies REC-chet rows in affected individuals that were present in unaffecteds as a REC-hom or REC-chet
+	violations = candidates[af.chet.rows,]
+	# 2) loop over violated chet genes
+	for(g in violations$gene){
+	#	3) look at subset of non-violated chets in genes with a chet violation
+		ok.chets = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model",af,sep="")] == "REC-chet") & candidates$validation == "ok" & candidates$Gene.wgEncodeGencodeBasicV19 == g) return(i)))
+	# 4) remove chets where mate vioated disease inheritance model
+		candidates$violations = "mate violation"
+	}
 }else{
-  validated = data.frame()
-  for(i in 1:length(af.dat)) validated = rbind(validated,af.dat[[i]])
+  candidates = data.frame()
+  for(i in 1:length(af.dat)) candidates = rbind(candidates,af.dat[[i]])
+  candidates$validation = "ok"
 }
-        
+
+validated = candidates[which(candidates$validation == "ok"),]
+    
 ## ANALYSIS STEP 3: FLAG SITES THAT HAVE LOW COVERAGE IN THE MAC61K DATA, MISSING ALLELE FREQUENCIES IN THE MAC61K DATA BUT NOT IN THE ESP AND 1000 GENOMES DATA, OR IS AN HGMD GENE WITH A MATCHING MODE OF INHERITANCE
 validated$Flag = 0
 validated$Flag[which(validated$Gene.wgEncodeGencodeBasicV19 %in% low.coverage & is.na(validated$mac63kFreq_ALL)==F)] = validated$Flag[which(validated$Gene.wgEncodeGencodeBasicV19 %in% low.coverage & is.na(validated$mac63kFreq_ALL)==F)] + 100
