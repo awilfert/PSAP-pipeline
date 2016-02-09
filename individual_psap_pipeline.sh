@@ -2,8 +2,8 @@
 # Requires vcf file as input
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH=~/
-ANNOVAR_PATH=/lts/dclab/amy/annovar
+PSAP_PATH= # ADD PATH HERE
+ANNOVAR_PATH= # ADD PATH HERE
 echo $PWD
 
 if [ $# -gt 0 ] && [ $1 == "-h" ]
