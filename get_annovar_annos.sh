@@ -26,5 +26,5 @@ for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 M X Y; do gu
 perl retrieve_seq_from_fasta.pl -format genericGene -seqdir humandb/ humandb/hg19_wgEncodeGencodeBasicV19.txt --outfile humandb/hg19_wgEncodeGencodeBasicV19Mrna.fa
 
 # Move ExAC allele frequencies provided with the PSAP pipeline to the ANNOVAR annotation folder and unzip
-mv ${PSAP_PATH}/lookups/hg19_mac63kFreq_ALL.txt.gz humandb/
+mv "${PSAP_PATH}/lookups/hg19_mac63kFreq_ALL.txt.gz" "humandb/"
 gzip -d humandb/hg19_mac63kFreq_ALL.txt.gz
