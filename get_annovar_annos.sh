@@ -7,7 +7,7 @@ cd $ANNOVAR_PATH
 perl annotate_variation.pl -downdb -buildver hg19 -webfrom annovar 1000g2014sep humandb/
 
 # Download CADD V1.3 scores from University of Washington and formats the data into annovar format
-#wget http://krishna.gs.washington.edu/download/CADD/v1.3/whole_genome_SNVs.tsv.gz 
+wget http://krishna.gs.washington.edu/download/CADD/v1.3/whole_genome_SNVs.tsv.gz 
 # Format CADD data into ANNOVAR format
 zcat whole_genome_SNVs.tsv.gz | awk -F"\t" '!/#/ {print $1"\t"$2"\t"$2"\t"$3"\t"$4"\t"$5","$6}' > humandb/hg19_cadd.txt
 wget http://krishna.gs.washington.edu/download/CADD/v1.3/whole_genome_SNVs.tsv.gz.tbi > humandb/hg19_cadd.txt.idx
