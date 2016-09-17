@@ -1,9 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH= # ADD PATH HERE
-ANNOVAR_PATH= # ADD PATH HERE
+PSAP_PATH= #INSERT PATH TO PSAP DIRECTORY HERE - INCLUDE THE PSAP DIRECTORY IN THE PATH
+ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE - INCLUDE THE ANNOVAR DIRECTORY IN THE PATH
+
 echo $PWD
+echo "PSAP path is "${PSAP_PATH}"psap/"
+echo "ANNOVAR PATH is "${ANNOVAR_PATH}
+module load R
 
 if [ $# -gt 0 ] && [ $1 == "-h" ]
 then
@@ -20,7 +25,7 @@ then
 	MISSING=0
 	for FILE in "hg19_ALL.sites.2014_09.txt" "hg19_cadd.txt" "hg19_esp6500si_all.txt" "hg19_snp137.txt" "hg19_wgEncodeGencodeBasicV19Mrna.fa" "hg19_wgEncodeGencodeBasicV19.txt" "hg19_mac63kFreq_ALL.txt"
 	do
-		if [ ! -f ${ANNOVAR_PATH}/humandb/$FILE ]
+		if [ ! -f ${ANNOVAR_PATH}humandb/$FILE ]
 		then
 			MISSING=$(( $MISSING+1 ))
 		fi
@@ -34,15 +39,19 @@ then
 
 # Extract and move to VCF file directory
 	FILE_LOC=${1%/*.vcf} # Extract location of VCF file
-	cd $FILE_LOC # Use location of  VCF file as working directory, this is where all output will be written
+	if [[ $FILE_LOC != *".vcf"* ]]
+	then
+		cd $FILE_LOC # Use location of  VCF file as working directory, this is where all output will be written
+	fi
 	echo $PWD
 	VCF=${1##/*/} # Extract VCF file name
+	echo $VCF
 	OUTFILE=$2 # Name of output file (no directory should be included here)
 	PED_FILE=$3 # Name of pedigree file (directory should be included here)
 
 # Convert vcf file to annovar file
         echo "PROGRESS: Converting VCF file to annovar input"
-        perl ${ANNOVAR_PATH}/convert2annovar.pl -format vcf4old $VCF -outfile ${OUTFILE}.avinput -includeinfo
+        perl ${ANNOVAR_PATH}convert2annovar.pl -format vcf4old $VCF -outfile ${OUTFILE}.avinput -includeinfo
 
 # Write column names from VCF file to header file (will be used later)
         grep '#' $VCF | tail -n 1 > ${OUTFILE}.avinput.header # Extract all VCF header lines.  Last line of VCF header contains column names.  Write last line of VCF header to .avinput.header file
@@ -55,10 +64,10 @@ then
         fi
 # Annotate with ANNOVAR
 	echo "PROGRESS: Annotating data with ANNOVAR"
-	perl ${ANNOVAR_PATH}/table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}/humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
+	perl ${ANNOVAR_PATH}table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
 
 # Annotate with PSAP (requires ped file)
-	bash ${PSAP_PATH}/psap/annotate_PSAP.sh ${OUTFILE}.avinput $PED_FILE $PSAP_PATH
+	bash ${PSAP_PATH}/annotate_PSAP.sh ${OUTFILE}.avinput $PED_FILE $PSAP_PATH
 
 else
 	echo "ERROR: Incorrect number of arguments." $# "arguments provided"

@@ -6,7 +6,7 @@ if(nrow(exome.AR) > 0){
 	popDat$Dz.Model = "REC-hom"
 ## for the hom case: mac26k hom look up table, make the "exome" of top hom hit in all genes in the healthy exome and the HGMD variant, calcualte hom genotype probs and fill in missing data with singleton rate
 ## use the mac26k look up table that estimated probabilities based on the expected number of homs
-	lookup<-read.table(file=paste(dir,"/psap/lookups/full.hom.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
+	lookup<-read.table(file=paste(dir,"/lookups/full.hom.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
 
 ## BEGIN popStat Calculations
 ### to get column info from lookup table

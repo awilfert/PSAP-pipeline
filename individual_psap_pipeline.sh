@@ -2,10 +2,10 @@
 # Requires vcf file as input
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH= # ADD PATH HERE
-ANNOVAR_PATH= # ADD PATH HERE
+PSAP_PATH= #INSERT PATH TO PSAP DIRECTORY HERE - INCLUDE THE PSAP DIRECTORY IN THE PATH
+ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE - INCLUDE THE ANNOVAR DIRECTORY IN THE PATH
 echo $PWD
-
+module load R
 if [ $# -gt 0 ] && [ $1 == "-h" ]
 then
 	echo "arg1 =  VCF file"
@@ -41,7 +41,7 @@ then
         OUTFILE=$2 # Name of output file (no directory should be included here)
         PED_FILE=$3 # Name of pedigree file (directory should be included here)
 
-# Wonvert vcf file to annovar file
+# Convert vcf file to annovar file
         echo "PROGRESS: Converting VCF file to annovar input"
         perl ${ANNOVAR_PATH}/convert2annovar.pl -format vcf4old $VCF -outfile ${OUTFILE}.avinput -includeinfo
 
@@ -57,19 +57,19 @@ then
 
 # Annotate with ANNOVAR
 	echo "PROGRESS: Annotating data with ANNOVAR"
-	perl ${ANNOVAR_PATH}/table_annovar.pl ${2}.avinput -remove -outfile annotated/${2}.avinput ${ANNOVAR_PATH}/humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
+	perl ${ANNOVAR_PATH}/table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}/humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
 
 # EXTRACT INDIVIDUAL IDS
 	echo "PROGRESS: Extracting individual IDs"
-	IDS=$(awk '{print $2}' $3)
+	IDS=$(awk '{print $2}' $PED_FILE)
 	IDX=1
 
 # RUN apply_popStat_individual.R for each individual
 	echo "PROGRESS: Starting PSAP annotation" 
 	for i in $IDS
 	do
-		Rscript ${PSAP_PATH}/psap/RScripts/apply_popStat_individual.R ${2}.avinput $i $PSAP_PATH &
-		if [ `expr $IDX % 20` -eq 0 ]
+		Rscript ${PSAP_PATH}/RScripts/apply_popStat_individual.R ${OUTFILE}.avinput $i $PSAP_PATH &
+		if [ `expr $IDX % 10` -eq 0 ]
 		then
 			echo "PROGRESS: Annotating individuals" $(( $IDX - 1 * 20)) "-" $(($IDX * 20)) "out of" ${#IDS}
 			wait # Limit number of individuals annotated to no more than 20 at a time
@@ -80,7 +80,7 @@ then
 
 # Generate report file - will look for variants present in two or more affected with PSAP < 1e-3 and not observed in unaffected
 	echo "PROGRESS: Generating report file for all individuals"
-	Rscript ${PSAP_PATH}/psap/RScripts/unrelated_candidate_analysis.R ${2}.avinput $3 $PSAP_PATH
+	Rscript ${PSAP_PATH}/RScripts/unrelated_candidate_analysis.R ${OUTFILE}.avinput $PED_FILE $PSAP_PATH
 
 else
 	echo "ERROR: Incorrect number of arguments." $# "arguments provided"
