@@ -15,7 +15,7 @@ if(nrow(exome.AD) > 0){
 #popDat$min.score<-as.numeric(apply(popDat[cols],1,min))
 #popDat<-popDat[which(popDat$Start.x != popDat$Start.y & popDat$min.score>0),]
 
-	lookup<-read.table(file=paste(dir,"/lookups/full.chet.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
+	lookup<-read.table(file=paste(dir,"/psap/lookups/full.chet.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
 
 ### pop.score p(V|G)
 ## BEGIN popStat Calculations

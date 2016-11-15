@@ -8,7 +8,7 @@ if(nrow(exome.AD) > 0){
 	popDat$Dz.Model = "DOM-het"
 ## for the het case: pull mac26k het look up table, make the "exome" of tom het hit in all geans in the healthy exome and the HGMD variant calculate het genotype probs and fill in missing data with singleton rate
 ## use the mac26k look up table that estimates probabilites based on the expected number of hets
-	lookup<-read.table(file=paste(dir,"/lookups/full.het.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
+	lookup<-read.table(file=paste(dir,"/psap/lookups/full.het.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F,header=F)
 
 print("beginning popStat claculations")
 ## BEGIN popStat Calculations

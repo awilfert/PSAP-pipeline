@@ -10,9 +10,9 @@ af<-fam$V2[which(fam$V6==2)]
 n.af<-length(af)
 
 id<-c(af,uf)
-coverage.info = read.table(file=paste(dir,"/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+coverage.info = read.table(file=paste(dir,"/psap/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 low.coverage = coverage.info[which(coverage.info$Mean.Coverage < 10),"Gene"]
-hgmd = read.table(file=paste(dir,"/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+hgmd = read.table(file=paste(dir,"/psap/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 hgmd.ad = unique(subset(hgmd,ModeInher == "AD")$Gene.wgEncodeGencodeBasicV19)
 hgmd.ar = unique(subset(hgmd,ModeInher == "AR")$Gene.wgEncodeGencodeBasicV19)
 
@@ -79,7 +79,7 @@ if(n.uf > 0){
     candidates$validation[af.hom.rows] = "violation"
 	
 	print("REC-chet disease model done")
-	af.chet.rows = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model.",af,sep="")] == "REC-chet") & candidates$vid[i] %in% uf.dat$vid[uf.chet.rows]) return(i))) # identifies REC disease model candidates that are also present in at least one unaffected individual as a REC-hom or REC-chet
+	af.chet.rows = unlist(lapply(1:nrow(candidates), function(i) if(any(candidates[i,paste("Dz.Model.",af,sep="")] == "REC-chet") & candidates$vid[i] %in% uf.dat$vid[uf.rec.rows]) return(i))) # identifies REC disease model candidates that are also present in at least one unaffected individual as a REC-hom or REC-chet
     candidates$validation[af.chet.rows] = "violation"
 	
 	print("checking for chet mate violations")	

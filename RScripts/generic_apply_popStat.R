@@ -17,7 +17,7 @@ children = fam$V2[which(fam$V3 == parents[1] & fam$V4 == parents[2])]
 ## at some point this may be cahanged to an argument based system but for now it's hard coded
 score = "scaled.cadd"
 scale = seq(0,70,0.05)
-lookup.genes = scan(file=paste(dir,"/lookups/lookup_genes.txt",sep=""),"character")
+lookup.genes = scan(file=paste(dir,"/psap/lookups/lookup_genes.txt",sep=""),"character")
 
 ## READ IN AND FORMAT DATA
 exome.raw<-read.table(file=paste("annotated/",fam.id,".avinput.hg19_multianno.txt",sep=""),sep="\t",stringsAsFactors=F,skip=1)
@@ -53,7 +53,7 @@ for(m in fam$V2[which(fam$V5 == 2)]){
 
 ### CLEAN DATA: 1) REMOVE BLACKLIST GENES, 2) REMOVE VARIANTS WITH AF DISCREPANCIES, 3) REMOVE GENES NOT INCLUDED IN LOOKUP TABLES, 4) REMOVE REGIONS THAT ARE NOT COVERED IN ExAC, 5) REMOVE MENDELIAN INCONSISTENCIES, 6) REMOVE VARIANTS THAT DO NOT PASS TRANCHE FILTER 
 # 1) REMOVE BLACKLISTED GENES-- I think it would be better to remove and output these genes to a separate file (like the missing data).  I also think this should include all low coverage genes because it's more generic.
-bl<-scan(paste(dir,"/lookups/blacklist_122814.txt",sep=""),what="character")
+bl<-scan(paste(dir,"/psap/lookups/blacklist_122814.txt",sep=""),what="character")
 bl.remove = unique(c(which(exome.raw$Gene.wgEncodeGencodeBasicV19 %in% bl),grep("^HLA", exome.raw$Gene.wgEncodeGencodeBasicV19), grep("^MUC", exome.raw$Gene.wgEncodeGencodeBasicV19), grep("^KRT", exome.raw$Gene.wgEncodeGencodeBasicV19),grep("^OR", exome.raw$Gene.wgEncodeGencodeBasicV19), grep("^TRBV", exome.raw$Gene.wgEncodeGencodeBasicV19)))
 
 # 2) REMOVE AF DISCREPANCIES (ANYTHING THAT IS MISSING IN ExAC BUT PRESENT IN 1000GP OR ESP AT GREATER THAN 5% FREQUENCY
@@ -138,7 +138,7 @@ keep<-unique(c(grep("splic",tmp.exome$Func.wgEncodeGencodeBasicV19),which(is.na(
 exome<-tmp.exome[keep,]
 
 # 5b) SCORE INDELS
-lookup.lof = read.table(file=paste(dir,"/lookups/full.lof.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F)
+lookup.lof = read.table(file=paste(dir,"/psap/lookups/full.lof.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F)
 indels = grep("^frameshift",exome$ExonicFunc.wgEncodeGencodeBasicV19)
 gene.index = as.integer(factor(exome$Gene.wgEncodeGencodeBasicV19[indels],levels=lookup.lof[,1]))
 exome$scaled.cadd[indels] = lookup.lof[gene.index,2]
@@ -168,21 +168,21 @@ for(m in indv.cols){
   print("beginning annotations")
   ## SOURCES CODE THAT WILL FORMAT AND ANALYZE THE DATA FOR EACH MODE OF INHERITANCE (AD, AR, CHET or X) MODEL
   ## AD MODEL CODE
-  source(paste(dir,"/RScripts/apply_pop_stat_het.R",sep=""))
+  source(paste(dir,"/psap/RScripts/apply_pop_stat_het.R",sep=""))
   print("AD model complete")
   
   ## AR MODEL CODE
-  source(paste(dir,"/RScripts/apply_pop_stat_hom.R",sep=""))
+  source(paste(dir,"/psap/RScripts/apply_pop_stat_hom.R",sep=""))
   print("AR-hom model complete")
   
   ## CHET MODEL CODE
-  source(paste(dir,"/RScripts/apply_pop_stat_chet_unphased.R",sep=""))
+  source(paste(dir,"/psap/RScripts/apply_pop_stat_chet_unphased.R",sep=""))
   print("AR-het model complete")
   
   print("processing data")
   names(out)[which(names(out) == "popScore")] = paste("popScore",names(info)[m],sep=".")
   names(out)[which(names(out) == "Dz.Model")] = paste("Dz.Model",names(info)[m],sep=".")
-  out[which(out[,paste("popScore.",names(info)[m],sep="") == 0]),paste("popScore.",names(info)[m],sep="")] = 1e-6
+  out[which(out[,paste("popScore.",names(info)[m],sep="")] == 0),paste("popScore.",names(info)[m],sep="")] = 1e-6
   out = out[which(!names(out) %in% c("i","j"))]
   names(out)[which(names(out) == "Geno")] = names(info)[m]
   final = merge(final,out,all.x=T,all.y=T,by=c("Chr","Start","Ref","Gene.wgEncodeGencodeBasicV19","Func.wgEncodeGencodeBasicV19","ExonicFunc.wgEncodeGencodeBasicV19","AAChange.wgEncodeGencodeBasicV19","mac63kFreq_ALL","1000g2014sep_all","esp6500si_all","Alt","cadd","scaled.cadd",names(info)[m]))
@@ -194,3 +194,4 @@ write.out = final[-which(rowSums(is.na(final[grep("popScore.",names(final))])) =
 write.table(write.out,file=paste("annotated/",fam.id,"_popStat.txt",sep=""),col.names=T,row.names=F,sep="\t")
 missing.out = missing[-which(missing$Func.wgEncodeGencodeBasicV19 == "exonic" | missing$Func.wgEncodeGencodeBasicV19 == "splicing;intronic" | missing$Func.wgEncodeGencodeBasicV19 =="splicing;exonic" | missing$Func.wgEncodeGencodeBasicV19 =="exonic;splicing"),]
 write.table(missing.out,file=paste("annotated/",fam.id,"_missing_data.txt",sep=""),sep="\t",col.names=T,row.names=F)
+

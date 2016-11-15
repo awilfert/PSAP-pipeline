@@ -10,9 +10,9 @@ af<-ped$V2[which(ped$V6==2)]
 n.af<-length(af)
 
 id<-c(af,uf)
-coverage.info = read.table(file=paste(dir,"/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+coverage.info = read.table(file=paste(dir,"/psap/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 low.coverage = coverage.info[which(coverage.info$Mean.Coverage < 10),"Gene"]
-hgmd = read.table(file=paste(dir,"/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+hgmd = read.table(file=paste(dir,"/psap/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 hgmd.ad = unique(subset(hgmd,ModeInher == "AD")$Gene.wgEncodeGencodeBasicV19)
 hgmd.ar = unique(subset(hgmd,ModeInher == "AR")$Gene.wgEncodeGencodeBasicV19)
 
@@ -37,7 +37,7 @@ for(i in af){
       tmp = dat[which(dat$Dz.Model == models[m]),]
       if(models[m] == "REC-chet" & nrow(tmp) > 0){
         a1 = dat[which(dat$Dz.Model == "DOM-het" & dat$Gene.wgEncodeGencodeBasicV19 %in% tmp$Gene.wgEncodeGencodeBasicV19),]
-        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model")],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
+        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model"))],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
         tmp = rbind(tmp,a1)
       }
       af.dat[[m]] = tmp
@@ -47,7 +47,7 @@ for(i in af){
       tmp = dat[which(dat$Dz.Model == models[m]),]
       if(models[m] == "REC-chet"){
         a1 = dat[which(dat$Dz.Model == "DOM-het" & dat$Gene.wgEncodeGencodeBasicV19 %in% tmp$Gene.wgEncodeGencodeBasicV19),]
-        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model")],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
+        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model"))],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
         tmp = rbind(tmp,a1)
       }
       af.dat[[m]]$pid[which(af.dat[[m]]$vid %in% tmp$vid)] = paste(af.dat[[m]]$pid[which(af.dat[[m]]$vid %in% tmp$vid)],tmp$pid[which(tmp$vid %in% af.dat[[m]]$vid)],sep=",")
@@ -133,4 +133,4 @@ validated$Flag[which(validated$Gene.wgEncodeGencodeBasicV19 %in% hgmd.ar & valid
 
 ## WRITE VALIDATED CANDIDATES TO FILE
 print("generating report file")
-write.table(validated[order(validated[c("popScore","Gene.wgEncodeGencodeBasicV19","Dz.Model")]),],file=paste("annotated/",fam.id,".report.txt",sep=""),sep="\t",col.names=T,row.names=F,quote=F)
+write.table(validated[order(validated[c("popScore","Gene.wgEncodeGencodeBasicV19","Dz.Model")]),],file=paste("annotated/",cohort.id,".report.txt",sep=""),sep="\t",col.names=T,row.names=F,quote=F)
