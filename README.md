@@ -95,4 +95,4 @@ $PATH_PATH/psap/RScripts/unrelated_candidate_analysis.R
 ## WHEN USING THIS SCRIPT PLEASE CITE
 Wang K, Li M, Hakonarson H. ANNOVAR: Functional annotation of genetic variants from next-generation sequencing data. Nucleic Acids Research, 38:e164, 2010
 
-Wilfert AB, Chao K, Kaushal M, Jain S, Zöllner S, Adams DR and Conrad DF.  An analysis of the n=1 problem in human genetics. Nature Genetics. In Press.
+Wilfert AB, Chao K, Kaushal M, Jain S, Zöllner S, Adams DR and Conrad DF.  Genome-wide significance testing of variation from single case exomes. Nature Genetics. doi:10.1038/ng.3697. 2016
