@@ -1,5 +1,5 @@
 ## CONTENTS
-THE PSAP PACKAGE CONTAINS FOUR BASH SCRIPTS AND ALL DEPENDANT R SCRIPTS AND LOOKUP TABLES. EACH SCRIPT IS DESCRIBED BELOW.
+THE PSAP PACKAGE CONTAINS FOUR BASH SCRIPTS, AND ALL DEPENDANT R SCRIPTS AND LOOKUP TABLES. EACH SCRIPT IS DESCRIBED BELOW.
 
 1) ```family_analysis_pipeline.sh```: Calls ANNOVAR to annotate data, calls an Rscript that performs some basic cleaning steps (mendelian inheritance filter - allows de novos, PSAP calibration filter, missing data filter, allele frequency discrepancy filter) and annotates all individuals with PSAP, calls an R script that performs a family based analysis to identify candidate variants (shared among all affected individuals and pattern of inheritance is consistent with disease model) 
 
@@ -15,17 +15,18 @@ This pipeline uses the R statistical software and ANNOVAR.  Please ensure R (htt
 ##### NOTE: Using other annotation software is not recommended because annotations may differ from the PSAP lookup tables and will introduce biases in downstream analyses. 
 
 ## PREPARING THE SCRIPT
-The local paths to the PSAP directory and ANNOVAR software need to be hard coded into the ```get_annovar_annos.sh```, ```family_analysis_pipeline.sh``` and ```individual_analysis_piepline.sh`` scripts at the lines indicated within each script.
+The local paths to the PSAP directory and ANNOVAR software need to be hard coded into the ```get_annovar_annos.sh```, ```family_analysis_pipeline.sh```, ```individual_analysis_piepline.sh```, and ```annotate_PSAP.sh``` scripts at the lines indicated within each script.
 
-Prior to running any of the analysis or annotation scripts for the first time you will need to run the get_annovar_annos.sh script to download all necessary ANNOVAR annotation files.  
-##### NOTE: It may take this script several days to download all of the necessary annotation files as some of them are very large (80 GB)
+Prior to running any of the analysis or annotation scripts for the first time you will need to run the ```get_annovar_annos.sh``` script to download all necessary ANNOVAR annotation files.  
+##### NOTE: It may take this script upto 24 hours to download all of the necessary annotation files as some of them are very large (~300 GB)
 
 ## RUNING THE SCRIPT
 To run the ```family_analysis_pipeline.sh``` or ```individual_analysis_pipeline.sh``` a VCF file, output file name, and pedigree file must be provided as arguments to the script in that order.
 
-EG. ```family_analysis_pipeline.sh example.VCF example example.ped OR individual_analysis_pipeline.sh example.VCF example example.ped```
+EG. ```family_analysis_pipeline.sh example.VCF example example.ped
+individual_analysis_pipeline.sh example.VCF example example.ped```
 
-##### NOTE: This script requires the ```FILENAME.avinput.hg19_multianno.txt``` to be present and it requires the ```FILENAME.avinput.hg19_multianno.txt``` file be annotated with GencodeV19 gene names, CADD scored, and allele frequencies from Sep 2014 release of 1000 Genomes, ESP 6500, and Mac63k_Freq (ExAC)
+##### NOTE: This script requires the ```FILENAME.avinput.hg19_multianno.txt``` to be present.  We use GencodeV19, the May 2014 release of CADD, and allele frequencies from Sep 2014 release of 1000 Genomes, and ESP 6500 which are all downloaded from ANNOVAR via the ```get_annovar_annos.sh``` script. The ExAC frequencies used are generated in house and is provided with the other lookup tables.
 
 The ```-h``` argument will provide a list of all the necessary arguments and print an example of the syntax for running the analysis scripts
 If the incorrect number of arguments is provided (too many or too few) the script will exit with an "INCORRECT NUMBER OF ARGUMENTS" message and a list of the necessary arguments.
