@@ -2,8 +2,8 @@
 # Requires vcf file as input
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH=/scratch/dclab/
-ANNOVAR_PATH=/scratch/dclab/annovar
+PSAP_PATH= #INSERT PATH TO PSAP DIRECTORY HERE eg. /scratch/dclab/
+ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE eg. /scratch/dclab/annovar/
 echo $PWD
 module load R
 if [ $# -gt 0 ] && [ $1 == "-h" ]
@@ -21,7 +21,7 @@ then
         MISSING=0
         for FILE in "hg19_ALL.sites.2014_09.txt" "hg19_cadd.txt" "hg19_esp6500si_all.txt" "hg19_snp137.txt" "hg19_wgEncodeGencodeBasicV19Mrna.fa" "hg19_wgEncodeGencodeBasicV19.txt" "hg19_mac63kFreq_ALL.txt"
         do
-                if [ ! -f ${ANNOVAR_PATH}/humandb/$FILE ]
+                if [ ! -f ${ANNOVAR_PATH}humandb/$FILE ]
                 then
                         MISSING=$(( $MISSING+1 ))
                 fi
@@ -43,7 +43,7 @@ then
 
 # Convert vcf file to annovar file
         echo "PROGRESS: Converting VCF file to annovar input"
-        perl ${ANNOVAR_PATH}/convert2annovar.pl -format vcf4old $VCF -outfile ${OUTFILE}.avinput -includeinfo
+        perl ${ANNOVAR_PATH}convert2annovar.pl -format vcf4old $VCF -outfile ${OUTFILE}.avinput -includeinfo
 
 # Write column names from VCF file to header file (will be used later)
         grep '#' $VCF | tail -n 1 > ${OUTFILE}.avinput.header # Extract all lines of the VCF header.  The last line of the VCF header contains coumn names - write columna names to .avinput.header file
@@ -57,7 +57,7 @@ then
 
 # Annotate with ANNOVAR
 	echo "PROGRESS: Annotating data with ANNOVAR"
-	perl ${ANNOVAR_PATH}/table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}/humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
+	perl ${ANNOVAR_PATH}table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
 
 # EXTRACT INDIVIDUAL IDS
 	echo "PROGRESS: Extracting individual IDs"

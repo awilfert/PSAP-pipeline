@@ -2,8 +2,8 @@
 
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH=/scratch/dclab/
-ANNOVAR_PATH=/scratch/dclab/annovar/
+PSAP_PATH= #INSERT PATH TO PSAP DIRECTORY HERE eg. /scratch/dclab/
+ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE eg. /scratch/dclab/annovar/
 
 echo $PWD
 echo "PSAP path is "${PSAP_PATH}"psap/"
@@ -67,7 +67,7 @@ then
 	perl ${ANNOVAR_PATH}table_annovar.pl ${OUTFILE}.avinput -remove -outfile annotated/${OUTFILE}.avinput ${ANNOVAR_PATH}humandb/ -buildver hg19 -protocol wgEncodeGencodeBasicV19,mac63kFreq_ALL,esp6500si_all,1000g2014sep_all,snp137,cadd -operation g,f,f,f,f,f -nastring NA -otherinfo -argument -separate,,,,,-otherinfo
 
 # Annotate with PSAP (requires ped file)
-	bash ${PSAP_PATH}/psap/annotate_PSAP.sh ${OUTFILE}.avinput $PED_FILE
+	bash ${PSAP_PATH}psap/annotate_PSAP.sh ${OUTFILE}.avinput $PED_FILE
 
 else
 	echo "ERROR: Incorrect number of arguments." $# "arguments provided"
