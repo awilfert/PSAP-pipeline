@@ -10,9 +10,9 @@ af<-ped$V2[which(ped$V6==2)]
 n.af<-length(af)
 
 id<-c(af,uf)
-coverage.info = read.table(file=paste(dir,"/psap/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+coverage.info = read.table(file=paste(dir,"psap/lookups/gene_coverage_stats_final_12172014.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 low.coverage = coverage.info[which(coverage.info$Mean.Coverage < 10),"Gene"]
-hgmd = read.table(file=paste(dir,"/psap/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
+hgmd = read.table(file=paste(dir,"psap/lookups/hgmd_pro_2013_4.12202014.annotated.txt",sep=""),sep="\t",header=T,stringsAsFactors=F)
 hgmd.ad = unique(subset(hgmd,ModeInher == "AD")$Gene.wgEncodeGencodeBasicV19)
 hgmd.ar = unique(subset(hgmd,ModeInher == "AR")$Gene.wgEncodeGencodeBasicV19)
 
@@ -26,35 +26,39 @@ print("databases loaded")
 print("analysing affected individuals")
 
 af.dat = list()
-for(i in af){
-  dat<-read.table(file=paste("annotated/",cohort.id,"_",i,"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
+for(i in 1:length(af)){
+  dat<-read.table(file=paste("annotated/",cohort.id,"_",af[i],"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
   dat$vid = paste(dat$Chr, dat$Start, dat$Alt,sep=":")
-  dat$pid = i
-  dat$n = 1
-  print(i)
-  if(length(af.dat) == 0){
-    for(m in 1:length(models)){
-      tmp = dat[which(dat$Dz.Model == models[m]),]
-      if(models[m] == "REC-chet" & nrow(tmp) > 0){
-        a1 = dat[which(dat$Dz.Model == "DOM-het" & dat$Gene.wgEncodeGencodeBasicV19 %in% tmp$Gene.wgEncodeGencodeBasicV19),]
-        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model"))],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
-        tmp = rbind(tmp,a1)
-      }
-      af.dat[[m]] = tmp
+  dat$pid = af[i]
+  print(af[i])
+  
+  for(m in 1:length(models)){
+    tmp = dat[which(dat$Dz.Model == models[m]),]
+    
+    if(models[m] == "REC-chet" & nrow(tmp) > 0){
+      a1 = dat[which(dat$Dz.Model == "DOM-het" & dat$Gene.wgEncodeGencodeBasicV19 %in% tmp$Gene.wgEncodeGencodeBasicV19),]
+      a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model"))],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
+      tmp = rbind(tmp,a1)
+      tmp$chet.id=paste(tmp$vid,tmp$popScore,sep=":")
     }
-  }else{
-    for(m in 1:length(models)){
-      tmp = dat[which(dat$Dz.Model == models[m]),]
-      if(models[m] == "REC-chet"){
-        a1 = dat[which(dat$Dz.Model == "DOM-het" & dat$Gene.wgEncodeGencodeBasicV19 %in% tmp$Gene.wgEncodeGencodeBasicV19),]
-        a1 = merge(a1[-which(names(a1) %in% c("popScore","Dz.Model"))],tmp[c("Gene.wgEncodeGencodeBasicV19","popScore","Dz.Model")])
-        tmp = rbind(tmp,a1)
-      }
-      af.dat[[m]]$pid[which(af.dat[[m]]$vid %in% tmp$vid)] = paste(af.dat[[m]]$pid[which(af.dat[[m]]$vid %in% tmp$vid)],tmp$pid[which(tmp$vid %in% af.dat[[m]]$vid)],sep=",")
-      af.dat[[m]]$n[which(af.dat[[m]]$vid %in% tmp$vid)] = af.dat[[m]]$n[which(af.dat[[m]]$vid %in% tmp$vid)] + 1
-      af.dat[[m]] = rbind(af.dat[[m]],tmp[which(!tmp$vid %in% af.dat[[m]]$vid),])
+      
+    if(i == 1){
+      af.dat[[m]] = tmp
+    }else{
+      af.dat[[m]] = rbind(af.dat[[m]],tmp)
     }
   }
+}
+
+candidates = data.frame()
+for(m in 1:length(models)){
+  print(models[m])
+  if(models[m] == "REC-chet"){
+    tmp = do.call(rbind,by(af.dat[[m]],af.dat[[m]]$chet.id, function(dat) return(data.frame(unique(dat[which(!names(dat) %in% c("pid","chet.id"))]),pid=paste(dat$pid,collapse=","),n=nrow(dat)))))
+  }else{
+    tmp = do.call(rbind,by(af.dat[[m]],af.dat[[m]]$vid, function(dat) return(data.frame(unique(dat[which(names(dat) != "pid")]),pid=paste(dat$pid,collapse=","),n=nrow(dat)))))
+  }
+  candidates = rbind(candidates,tmp)
 }
 
 ## ANALYSIS STEP 2: Validate inheritance models
@@ -68,9 +72,6 @@ if(n.uf > 0){
 	}
 
 	uf.dat = unique(uf.dat[c("Gene.wgEncodeGencodeBasicV19","Chr","Start","Ref","Alt","Dz.Model","Geno","vid","popScore")])
-
-  candidates = data.frame()
-  for(i in 1:length(af.dat)) candidates= rbind(candidates,af.dat[[i]])
   
   candidates$validation = "ok"
   candidates$validation[which(candidates$Dz.Model == "DOM-het" & candidates$vid %in% uf.dat$vid)] = "violation"
@@ -114,15 +115,13 @@ if(n.uf > 0){
 		}
 	}
 }else{
-  candidates = data.frame()
-  for(i in 1:length(af.dat)) candidates = rbind(candidates,af.dat[[i]])
   candidates$validation = "ok"
 }
 
 print("validation complete")
 
 validated = candidates[which(is.na(candidates$pid) == F & candidates$validation != "violation"),]
-
+print(dim(validated))
 rm(candidates)
 
 ## ANALYSIS STEP 3: FLAG SITES THAT HAVE LOW COVERAGE IN THE MAC61K DATA, MISSING ALLELE FREQUENCIES IN THE MAC61K DATA BUT NOT IN THE ESP AND 1000 GENOMES DATA, OR IS AN HGMD GENE WITH A MATCHING MODE OF INHERITANCE
@@ -133,4 +132,4 @@ validated$Flag[which(validated$Gene.wgEncodeGencodeBasicV19 %in% hgmd.ar & valid
 
 ## WRITE VALIDATED CANDIDATES TO FILE
 print("generating report file")
-write.table(validated[order(validated[c("popScore","Gene.wgEncodeGencodeBasicV19","Dz.Model")]),],file=paste("annotated/",cohort.id,".report.txt",sep=""),sep="\t",col.names=T,row.names=F,quote=F)
+write.table(validated[order(validated$popScore,validated$Gene.wgEncodeGencodeBasicV19,validated$Dz.Model),],file=paste("annotated/",cohort.id,".report.txt",sep=""),sep="\t",col.names=T,row.names=F,quote=F)

@@ -2,8 +2,8 @@
 
 # $1 = vcf file, $2 = output file, $3 = ped file
 
-PSAP_PATH= #ADD PATH TO PSAP DIRECTORY HERE eg. /scratch/dclab/
-ANNOVAR_PATH= #ADD PATH TO ANNOVAR DIRECTORY HERE eg. /scratch/dclab/annovar/
+PSAP_PATH=/scratch/dclab/
+ANNOVAR_PATH=/scratch/dclab/annovar/
 
 echo $PWD
 echo "PSAP path is "${PSAP_PATH}"psap/"
