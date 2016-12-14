@@ -61,17 +61,17 @@ then
 
 # EXTRACT INDIVIDUAL IDS
 	echo "PROGRESS: Extracting individual IDs"
-	IDS=$(awk '{print $2}' $PED_FILE)
+	IDS=($(awk '{print $2}' $PED_FILE))
 	IDX=1
 
 # RUN apply_popStat_individual.R for each individual
 	echo "PROGRESS: Starting PSAP annotation" 
-	for i in $IDS
+	for i in ${IDS[@]}
 	do
 		Rscript ${PSAP_PATH}psap/RScripts/apply_popStat_individual.R ${OUTFILE}.avinput $i $PSAP_PATH $PED_FILE &
 		if [ `expr $IDX % 10` -eq 0 ]
 		then
-			echo "PROGRESS: Annotating individuals" $(( $IDX - 1 * 20)) "-" $(($IDX * 20)) "out of" ${#IDS}
+			echo "PROGRESS: Annotating individuals" $(($IDX - 10)) "-" $IDX "out of" ${#IDS[@]}
 			wait # Limit number of individuals annotated to no more than 20 at a time
 		fi
 		IDX=$(($IDX+1))
