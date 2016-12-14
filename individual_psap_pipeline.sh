@@ -5,7 +5,7 @@
 PSAP_PATH= #INSERT PATH TO PSAP DIRECTORY HERE eg. /scratch/dclab/
 ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE eg. /scratch/dclab/annovar/
 echo $PWD
-module load R
+
 if [ $# -gt 0 ] && [ $1 == "-h" ]
 then
 	echo "arg1 =  VCF file"
@@ -68,7 +68,7 @@ then
 	echo "PROGRESS: Starting PSAP annotation" 
 	for i in $IDS
 	do
-		Rscript ${PSAP_PATH}psap/RScripts/apply_popStat_individual.R ${OUTFILE}.avinput $i $PSAP_PATH &
+		Rscript ${PSAP_PATH}psap/RScripts/apply_popStat_individual.R ${OUTFILE}.avinput $i $PSAP_PATH $PED_FILE &
 		if [ `expr $IDX % 10` -eq 0 ]
 		then
 			echo "PROGRESS: Annotating individuals" $(( $IDX - 1 * 20)) "-" $(($IDX * 20)) "out of" ${#IDS}
