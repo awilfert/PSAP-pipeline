@@ -6,13 +6,13 @@ args<-commandArgs(trailingOnly=T) ## args[1] = family - must be annovar annotate
 dir = args[3]
 
 fam.id<-strsplit(args[1],".avinput",fixed=T)
-ped = read.table(args[4],stringsAsFactors=F,sep="\t")
+ped = read.table(args[4],stringsAsFactors=F)
 
 ## Individual ID - ASSUMES only one individual is being analyzed/annotated
 indv.id = args[2]
 
 ## at some point this may be changed to an argument based system but for now it's hard coded
-score = "scaled.cadd"
+score = "CADD_Phred"
 scale = seq(0,70,0.05)
 lookup.genes = scan(file=paste(dir,"psap/lookups/lookup_genes.txt",sep=""),"character")
 
@@ -23,7 +23,12 @@ vcf.header<-read.table(file=paste(fam.id,".avinput.header",sep=""),sep="\t",stri
 stopifnot(indv.id %in% vcf.header) # CHECKS THAT SPECIFIED INDIVIDUAL IS IN THE DATA
 n.annos=ncol(header)
 names(exome.raw)=c(header[-n.annos],vcf.header)
-exome.raw$scaled.cadd = as.numeric(sapply(exome.raw$cadd,function(x) unlist(strsplit(x,","))[2]))
+
+if(any(grepl("cadd",names(exome.raw))) == T){
+    exome.raw[,score] = as.numeric(sapply(exome.raw$cadd,function(x) unlist(strsplit(x,","))[2]))
+}
+
+stopifnot(any(grepl("CADD_Phred",names(exome.raw))))
 
 # Extracts genotype info for specified individual
 a1 = substr(exome.raw[,indv.id],1,1)
@@ -39,7 +44,7 @@ if(length(which(a1 == 0 & a2 == 0)) > 0){
   exome.raw[which(a1 == 0 & a2 == 0),indv.id] = "ref"
 }
 
-if(ped$V5[which(ped$V2 == indv.id) == 1]){
+if(ped$V5[which(ped$V2 == indv.id)] == 1){
   exome.raw[which(exome.raw[,indv.id] %in% c("het","hom") & exome.raw[,"Chr"] == "X"),indv.id] = "hom"
   exome.raw[which(exome.raw[,indv.id] %in% c("het","hom") & exome.raw[,"Chr"] == "Y"),indv.id] = "hom"
 }
@@ -74,15 +79,15 @@ exome<-tmp.exome[keep,]
 lookup.lof = read.table(file=paste(dir,"psap/lookups/full.lof.pCADD.gencodeV19.allsites.txt.gz",sep=""),stringsAsFactors=F)
 indels = grep("^frameshift",exome$ExonicFunc.wgEncodeGencodeBasicV19)
 gene.index = as.integer(factor(exome$Gene.wgEncodeGencodeBasicV19[indels],levels=lookup.lof[,1]))
-exome$scaled.cadd[indels] = lookup.lof[gene.index,2]
+exome[,score][indels] = lookup.lof[gene.index,2]
 
 # 5) REMOVE VARIANTS THAT DO NOT PASS QUALITY FILTER OR HAVE MISSING pCADD SCORES
-info<-exome[which(exome$FILTER=="PASS" & is.na(exome[,score]) == F | exome$FILTER=="." & is.na(exome[,score]) == F),c("Chr","Start","Ref","Gene.wgEncodeGencodeBasicV19","Func.wgEncodeGencodeBasicV19","ExonicFunc.wgEncodeGencodeBasicV19","AAChange.wgEncodeGencodeBasicV19","mac63kFreq_ALL","1000g2014sep_all","esp6500si_all","Alt","cadd","scaled.cadd",indv.id)]
+info<-exome[which(exome$FILTER=="PASS" & is.na(exome[,score]) == F | exome$FILTER=="." & is.na(exome[,score]) == F),c("Chr","Start","Ref","Gene.wgEncodeGencodeBasicV19","Func.wgEncodeGencodeBasicV19","ExonicFunc.wgEncodeGencodeBasicV19","AAChange.wgEncodeGencodeBasicV19","mac63kFreq_ALL","1000g2014sep_all","esp6500si_all","Alt",score,indv.id)]
 
 ## OUTPUT MISSING DATA/DATA NOT INCLUDED IN ANY OF THE ABOVE ANALYSES
 id.raw = paste(exome.raw$Chr,exome.raw$Start,exome.raw$Ref,exome.raw$Alt,sep=":")
 id.final = paste(info$Chr,as.numeric(info$Start),info$Ref,info$Alt,sep=":")
-missing<-unique(exome.raw[which(! id.raw %in% id.final),c("Chr","Start","Ref","Gene.wgEncodeGencodeBasicV19","Func.wgEncodeGencodeBasicV19","ExonicFunc.wgEncodeGencodeBasicV19","AAChange.wgEncodeGencodeBasicV19","mac63kFreq_ALL","1000g2014sep_all","esp6500si_all","Alt","cadd","scaled.cadd",indv.id)])
+missing<-unique(exome.raw[which(! id.raw %in% id.final),c("Chr","Start","Ref","Gene.wgEncodeGencodeBasicV19","Func.wgEncodeGencodeBasicV19","ExonicFunc.wgEncodeGencodeBasicV19","AAChange.wgEncodeGencodeBasicV19","mac63kFreq_ALL","1000g2014sep_all","esp6500si_all","Alt",score,indv.id)])
 
 rm(list=c("keep","exome","tmp.exome","exome.raw","af.remove","lookup.remove","bl.remove","bl","lookup.genes"))
 class(info[,score]) = "numeric"

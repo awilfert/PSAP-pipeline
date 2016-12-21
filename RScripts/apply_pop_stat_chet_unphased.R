@@ -8,7 +8,7 @@ dups<-names(table(exome.AD$Gene.wgEncodeGencodeBasicV19)[which(table(exome.AD$Ge
 exome.AD<-exome.AD[exome.AD$Gene.wgEncodeGencodeBasicV19 %in% dups,]
 
 if(nrow(exome.AD) > 0){
-	popDat<-do.call(rbind,by(exome.AD,exome.AD$Gene.wgEncodeGencodeBasicV19, function(x) { x$scaled.cadd<-as.numeric(x$scaled.cadd); x<-x[order(x$scaled.cadd,decreasing=T,na.last=NA),]; return(x[2,]) }))
+	popDat<-do.call(rbind,by(exome.AD,exome.AD$Gene.wgEncodeGencodeBasicV19, function(x,score) { x[,score]<-as.numeric(x[,score]); x<-x[order(x[,score],decreasing=T,na.last=NA),]; return(x[2,]) },score=score))
 	popDat$Dz.Model = "REC-chet"
 ## take the min of the two variants (will require a "by" statement)
 #cols = paste(score,c(".x",".y"),sep="")

@@ -66,7 +66,7 @@ if(n.uf > 0){
 	print("validating against unrelated individuals")
 	uf.dat = data.frame()
 	for(i in uf){
-		dat<-read.table(file=paste("annotated/",fam.id,"_",i,"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
+		dat<-read.table(file=paste("annotated/",cohort.id,"_",i,"_popStat.txt",sep=""),sep="\t",header=T,stringsAsFactors=F,check.names=F)
 		dat$vid = paste(dat$Chr, dat$Start, dat$Alt,sep=":")
 		uf.dat = rbind(uf.dat,dat)
 	}
