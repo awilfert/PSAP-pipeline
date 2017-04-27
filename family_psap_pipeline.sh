@@ -8,7 +8,6 @@ ANNOVAR_PATH= #INSERT PATH TO ANNOVAR DIRECTORY HERE eg. /scratch/dclab/annovar/
 echo $PWD
 echo "PSAP path is "${PSAP_PATH}"psap/"
 echo "ANNOVAR PATH is "${ANNOVAR_PATH}
-module load R
 
 if [ $# -gt 0 ] && [ $1 == "-h" ]
 then
