@@ -34,11 +34,11 @@ stopifnot(any(grepl("CADD_Phred",names(exome.raw))))
 a1 = substr(exome.raw[,indv.id],1,1)
 a2 = substr(exome.raw[,indv.id],3,3)
 exome.raw[indv.id] = "NA"
-if(length(which(a1 != a2)) > 0){
-  exome.raw[which(a1 != a2),indv.id] = "het"
+if(length(which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA))) > 0){
+  exome.raw[which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA)),indv.id] = "het"
 }
-if(length(which(!a1 %in% c(0,".") & !a2 %in% c(0,".") & a1 == a2)) > 0){
-  exome.raw[which(!a1 %in% c(0,".") & !a2 %in% c(0,".") & a1 == a2),indv.id] = "hom"
+if(length(which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2)) > 0){
+  exome.raw[which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2),indv.id] = "hom"
 }
 if(length(which(a1 == 0 & a2 == 0)) > 0){
   exome.raw[which(a1 == 0 & a2 == 0),indv.id] = "ref"

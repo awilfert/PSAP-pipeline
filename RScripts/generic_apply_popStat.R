@@ -36,11 +36,11 @@ for(i in fam$V2){
   a1 = substr(exome.raw[,i],1,1)
   a2 = substr(exome.raw[,i],3,3)
   exome.raw[i] = NA
-  if(length(which(a1 != a2)) > 0){
-    exome.raw[which(a1 != a2),i] = "het"
+  if(length(which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA))) > 0){
+    exome.raw[which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA)),i] = "het"
   }
-  if(length(which(!a1 %in% c(0,".") & !a2 %in% c(0,".") & a1 == a2)) > 0){
-    exome.raw[which(!a1 %in% c(0,".") & !a2 %in% c(0,".") & a1 == a2),i] = "hom"
+  if(length(which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2)) > 0){
+    exome.raw[which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2),i] = "hom"
   }
   if(length(which(a1 == 0 & a2 == 0)) > 0){
     exome.raw[which(a1 == 0 & a2 == 0),i] = "ref"
