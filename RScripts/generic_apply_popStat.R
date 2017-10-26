@@ -37,7 +37,7 @@ for(i in fam$V2){
   a2 = substr(exome.raw[,i],3,3)
   exome.raw[i] = NA
   if(length(which(a1 != a2 & !a1 %in% c(".","",NA) & !a2 %in% c(".","",NA))) > 0){
-    exome.raw[which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA)),i] = "het"
+    exome.raw[which(a1 != a2 & !a1 %in% c(".","",NA) & !a2 %in% c(".","",NA)),i] = "het"
   }
   if(length(which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2)) > 0){
     exome.raw[which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2),i] = "hom"

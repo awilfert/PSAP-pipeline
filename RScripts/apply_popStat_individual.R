@@ -35,7 +35,7 @@ a1 = substr(exome.raw[,indv.id],1,1)
 a2 = substr(exome.raw[,indv.id],3,3)
 exome.raw[indv.id] = "NA"
 if(length(which(a1 != a2 & !a1 %in% c(".","",NA) & !a2 %in% c(".","",NA))) > 0){
-  exome.raw[which(a1 != a2 & !a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA)),indv.id] = "het"
+  exome.raw[which(a1 != a2 & !a1 %in% c(".","",NA) & !a2 %in% c(".","",NA)),indv.id] = "het"
 }
 if(length(which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2)) > 0){
   exome.raw[which(!a1 %in% c(0,".","",NA) & !a2 %in% c(0,".","",NA) & a1 == a2),indv.id] = "hom"
